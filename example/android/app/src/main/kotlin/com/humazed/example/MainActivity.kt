@@ -1,6 +1,0 @@
-package com.humazed.example
-
-import io.flutter.embedding.android.FlutterActivity
-
-class MainActivity: FlutterActivity() {
-}
