@@ -94,7 +94,7 @@ class LocationPickerState extends State<LocationPicker> {
   var searchInputKey = GlobalKey<SearchInputState>();
 
   bool hasSearchTerm = false;
-  bool showSugesstion = true;
+  bool showSuggestion = true;
 
   /// Hides the autocomplete overlay
   void clearOverlay() {
@@ -208,7 +208,7 @@ class LocationPickerState extends State<LocationPicker> {
             suggestions.add(RichSuggestion(aci, () {
               decodeAndSelectPlace(aci.id);
               FocusScope.of(context).unfocus();
-              showSugesstion = false;
+              showSuggestion = false;
             }));
           }
         }
@@ -368,7 +368,7 @@ class LocationPickerState extends State<LocationPicker> {
         locationResult!.address = road;
         locationResult!.latLng = latLng;
         locationResult!.placeId = placeId;
-        showSugesstion = true;
+        showSuggestion = true;
       });
     }
   }
@@ -418,7 +418,7 @@ class LocationPickerState extends State<LocationPicker> {
                 title: SearchInput(
                   (input) {
                     print("input : $input");
-                    if (showSugesstion) searchPlace(input.trim());
+                    if (showSuggestion) searchPlace(input.trim());
                   },
                   key: searchInputKey,
                   boxDecoration: widget.searchBarBoxDecoration,
