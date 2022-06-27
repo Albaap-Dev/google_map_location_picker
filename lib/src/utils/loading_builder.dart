@@ -60,7 +60,7 @@ class _FutureLoadingBuilderState<T> extends State<FutureLoadingBuilder<T?>> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<T?>(
+    return FutureBuilder(
       future: widget.mutable ? widget.future : future,
       initialData: widget.initialData,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -91,14 +91,12 @@ class _FutureLoadingBuilderState<T> extends State<FutureLoadingBuilder<T?>> {
                   overflow: TextOverflow.fade,
                 );
               } else {
-                d('Unknow error: $error');
+                d('Unknown error: $error');
                 return Center(child: Text('Unknown error'));
               }
             }
-
             return widget.builder!(context, snapshot.data);
         }
-        return widget.builder!(context, snapshot.data);
       },
     );
   }

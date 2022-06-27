@@ -13,7 +13,6 @@ import 'package:google_map_location_picker/src/utils/uuid.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-
 import 'model/auto_comp_iete_item.dart';
 import 'model/location_result.dart';
 import 'model/nearby_place.dart';
@@ -94,7 +93,7 @@ class LocationPickerState extends State<LocationPicker> {
   var searchInputKey = GlobalKey<SearchInputState>();
 
   bool hasSearchTerm = false;
-  bool showSugesstion = true;
+  bool showSuggestion = true;
 
   /// Hides the autocomplete overlay
   void clearOverlay() {
@@ -109,8 +108,6 @@ class LocationPickerState extends State<LocationPicker> {
   /// is hidden so as to give more room and better experience for the
   /// autocomplete list overlay.
   void searchPlace(String place) {
-    if (context == null) return;
-
     clearOverlay();
 
     setState(() => hasSearchTerm = place.length > 0);
@@ -180,8 +177,7 @@ class LocationPickerState extends State<LocationPicker> {
     }
 
     LocationUtils.getAppHeaders()
-        .then((headers) => http.get(Uri.parse(endpoint),
-            headers: headers as Map<String, String>?))
+        .then((headers) => http.get(Uri.parse(endpoint), headers: headers))
         .then((response) {
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
@@ -208,7 +204,7 @@ class LocationPickerState extends State<LocationPicker> {
             suggestions.add(RichSuggestion(aci, () {
               decodeAndSelectPlace(aci.id);
               FocusScope.of(context).unfocus();
-              showSugesstion = false;
+              showSuggestion = false;
             }));
           }
         }
@@ -232,8 +228,7 @@ class LocationPickerState extends State<LocationPicker> {
             '&language=${widget.language}';
 
     LocationUtils.getAppHeaders()
-        .then((headers) => http.get(Uri.parse(endpoint),
-            headers: headers as Map<String, String>?))
+        .then((headers) => http.get(Uri.parse(endpoint), headers: headers))
         .then((response) {
       if (response.statusCode == 200) {
         Map<String, dynamic> location =
@@ -303,8 +298,7 @@ class LocationPickerState extends State<LocationPicker> {
               "location=${latLng.latitude},${latLng.longitude}&radius=150" +
               "&language=${widget.language}";
 
-      return http.get(Uri.parse(endpoint),
-          headers: headers as Map<String, String>?);
+      return http.get(Uri.parse(endpoint), headers: headers);
     }).then((response) {
       if (response.statusCode == 200) {
         nearbyPlaces.clear();
@@ -342,8 +336,7 @@ class LocationPickerState extends State<LocationPicker> {
             "&language=${widget.language}";
 
     final response = await http.get(Uri.parse(endpoint),
-        headers: await (LocationUtils.getAppHeaders()
-            as FutureOr<Map<String, String>?>));
+        headers: await (LocationUtils.getAppHeaders()));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> responseJson = jsonDecode(response.body);
@@ -368,7 +361,7 @@ class LocationPickerState extends State<LocationPicker> {
         locationResult!.address = road;
         locationResult!.latLng = latLng;
         locationResult!.placeId = placeId;
-        showSugesstion = true;
+        showSuggestion = true;
       });
     }
   }
@@ -418,7 +411,7 @@ class LocationPickerState extends State<LocationPicker> {
                 title: SearchInput(
                   (input) {
                     print("input : $input");
-                    if (showSugesstion) searchPlace(input.trim());
+                    if (showSuggestion) searchPlace(input.trim());
                   },
                   key: searchInputKey,
                   boxDecoration: widget.searchBarBoxDecoration,
