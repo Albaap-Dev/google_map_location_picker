@@ -1,9 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-
-import 'package:android_intent/android_intent.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:geolocator/geolocator.dart';
@@ -282,7 +279,7 @@ class MapPickerState extends State<MapPicker> {
               headers: await (LocationUtils.getAppHeaders())))
           .body);
 
-      print("BLB data ${response}");
+      print("BLB data $response");
 
       return {
         "placeId": response['results'][0]['place_id'],
@@ -413,40 +410,6 @@ class MapPickerState extends State<MapPicker> {
       },
     );
   }
-
-  // TODO: 9/12/2020 this is no longer needed, remove in the next release
-  Future _checkGps() async {
-    if (!(await Geolocator.isLocationServiceEnabled())) {
-      if (Theme.of(context).platform == TargetPlatform.android) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text(S.of(context)?.cant_get_current_location ??
-                  "Can't get current location"),
-              content: Text(S
-                      .of(context)
-                      ?.please_make_sure_you_enable_gps_and_try_again ??
-                  'Please make sure you enable GPS and try again'),
-              actions: <Widget>[
-                FlatButton(
-                  child: Text('Ok'),
-                  onPressed: () {
-                    final AndroidIntent intent = AndroidIntent(
-                        action: 'android.settings.LOCATION_SOURCE_SETTINGS');
-
-                    intent.launch();
-                    Navigator.of(context, rootNavigator: true).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      }
-    }
-  }
 }
 
 class _MapFabs extends StatelessWidget {
@@ -462,7 +425,7 @@ class _MapFabs extends StatelessWidget {
   final bool? myLocationButtonEnabled;
   final bool? layersButtonEnabled;
 
-  final VoidCallback onToggleMapTypePressed;
+  final VoidCallback? onToggleMapTypePressed;
   final VoidCallback onMyLocationPressed;
 
   @override
