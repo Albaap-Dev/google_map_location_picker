@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -41,6 +42,7 @@ class LocationPicker extends StatefulWidget {
     this.language,
     this.desiredAccuracy,
     this.markerColor = Colors.black,
+    this.progressIndicatorWidget,
   });
 
   final String apiKey;
@@ -70,6 +72,7 @@ class LocationPicker extends StatefulWidget {
   final LocationAccuracy? desiredAccuracy;
   final Color markerColor;
 
+  final Widget? progressIndicatorWidget;
   @override
   LocationPickerState createState() => LocationPickerState();
 }
@@ -399,7 +402,7 @@ class LocationPickerState extends State<LocationPicker> {
       ],
       child: Builder(builder: (context) {
         return WillPopScope(
-            onWillPop: () async => widget.automaticallyImplyLeading,
+            onWillPop: () async => _delayedPop(),
             child: Scaffold(
               extendBodyBehindAppBar: true,
               appBar: AppBar(
@@ -444,6 +447,36 @@ class LocationPickerState extends State<LocationPicker> {
             ));
       }),
     );
+  }
+
+  // add delay to the map pop to avoid `Fatal Exception: java.lang.NullPointerException` error on Android
+  Future<bool> _delayedPop() async {
+    if (Platform.isAndroid) {
+      Navigator.of(context, rootNavigator: true).push(
+        PageRouteBuilder(
+          pageBuilder: (_, __, ___) => WillPopScope(
+            onWillPop: () async => false,
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              body: Center(
+                child: widget.progressIndicatorWidget ??
+                    CircularProgressIndicator.adaptive(),
+              ),
+            ),
+          ),
+          transitionDuration: Duration.zero,
+          barrierDismissible: false,
+          barrierColor: Colors.black45,
+          opaque: false,
+        ),
+      );
+
+      await Future.delayed(const Duration(milliseconds: 500));
+      Navigator.of(context)
+        ..pop()
+        ..pop();
+    }
+    return widget.automaticallyImplyLeading;
   }
 }
 
