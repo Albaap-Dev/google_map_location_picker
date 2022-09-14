@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
@@ -36,6 +37,7 @@ class MapPicker extends StatefulWidget {
     this.language,
     this.desiredAccuracy,
     this.markerColor = Colors.black,
+    this.progressIndicatorWidget,
   }) : super(key: key);
 
   final String apiKey;
@@ -63,6 +65,7 @@ class MapPicker extends StatefulWidget {
   final String? language;
 
   final LocationAccuracy? desiredAccuracy;
+  final Widget? progressIndicatorWidget;
 
   @override
   MapPickerState createState() => MapPickerState();
@@ -247,7 +250,8 @@ class MapPickerState extends State<MapPicker> {
                   ),
                   Spacer(),
                   FloatingActionButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      await _delayedPop();
                       Navigator.of(context).pop({
                         'location': LocationResult(
                           latLng: locationProvider.lastIdleLocation,
@@ -266,6 +270,34 @@ class MapPickerState extends State<MapPicker> {
         ),
       ),
     );
+  }
+
+  Future<void> _delayedPop() async {
+    if (Platform.isAndroid) {
+      Navigator.of(context, rootNavigator: true).push(
+        PageRouteBuilder(
+          pageBuilder: (_, __, ___) => WillPopScope(
+            onWillPop: () async => false,
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              body: Center(
+                child: widget.progressIndicatorWidget ??
+                    CircularProgressIndicator.adaptive(),
+              ),
+            ),
+          ),
+          transitionDuration: Duration.zero,
+          barrierDismissible: false,
+          barrierColor: Colors.black45,
+          opaque: false,
+        ),
+      );
+
+      await Future.delayed(const Duration(milliseconds: 500));
+      Navigator.of(context)
+        ..pop()
+        ..pop();
+    }
   }
 
   Future<Map<String, String?>?> getAddress(LatLng? location) async {
