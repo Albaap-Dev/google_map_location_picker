@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
@@ -36,6 +37,7 @@ class MapPicker extends StatefulWidget {
     this.language,
     this.desiredAccuracy,
     this.markerColor = Colors.black,
+    this.loadingIndicator,
   }) : super(key: key);
 
   final String apiKey;
@@ -63,6 +65,7 @@ class MapPicker extends StatefulWidget {
   final String? language;
 
   final LocationAccuracy? desiredAccuracy;
+  final Widget? loadingIndicator;
 
   @override
   MapPickerState createState() => MapPickerState();
@@ -144,17 +147,20 @@ class MapPickerState extends State<MapPicker> {
     if (_currentPosition != null && dialogOpen != null)
       Navigator.of(context, rootNavigator: true).pop();
 
-    return Scaffold(
-      body: Builder(
-        builder: (context) {
-          if (_currentPosition == null &&
-              widget.automaticallyAnimateToCurrentLocation! &&
-              widget.requiredGPS!) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    return WillPopScope(
+      onWillPop: Platform.isIOS ? null : _delayedPop,
+      child: Scaffold(
+        body: Builder(
+          builder: (context) {
+            if (_currentPosition == null &&
+                widget.automaticallyAnimateToCurrentLocation! &&
+                widget.requiredGPS!) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          return buildMap();
-        },
+            return buildMap();
+          },
+        ),
       ),
     );
   }
@@ -165,6 +171,7 @@ class MapPickerState extends State<MapPicker> {
         children: <Widget>[
           GoogleMap(
             myLocationButtonEnabled: false,
+            minMaxZoomPreference: const MinMaxZoomPreference(0, 16),
             initialCameraPosition: CameraPosition(
               target: widget.initialCenter!,
               zoom: widget.initialZoom!,
@@ -208,6 +215,34 @@ class MapPickerState extends State<MapPicker> {
         ],
       ),
     );
+  }
+
+  // add delay to the map pop to avoid `Fatal Exception: java.lang.NullPointerException` error on Android
+  Future<bool> _delayedPop() async {
+    Navigator.of(context, rootNavigator: true).push(
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => WillPopScope(
+          onWillPop: () async => false,
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Center(
+              child: widget.loadingIndicator ??
+                  CircularProgressIndicator.adaptive(),
+            ),
+          ),
+        ),
+        transitionDuration: Duration.zero,
+        barrierDismissible: false,
+        barrierColor: Colors.black45,
+        opaque: false,
+      ),
+    );
+
+    await Future.delayed(const Duration(milliseconds: 500));
+    Navigator.of(context)
+      ..pop()
+      ..pop();
+    return Future.value(false);
   }
 
   Widget locationCard() {

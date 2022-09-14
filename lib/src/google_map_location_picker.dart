@@ -41,6 +41,7 @@ class LocationPicker extends StatefulWidget {
     this.language,
     this.desiredAccuracy,
     this.markerColor = Colors.black,
+    this.loadingIndicator,
   });
 
   final String apiKey;
@@ -69,6 +70,7 @@ class LocationPicker extends StatefulWidget {
 
   final LocationAccuracy? desiredAccuracy;
   final Color markerColor;
+  final Widget? loadingIndicator;
 
   @override
   LocationPickerState createState() => LocationPickerState();
@@ -440,6 +442,7 @@ class LocationPickerState extends State<LocationPicker> {
                 language: widget.language,
                 desiredAccuracy: widget.desiredAccuracy,
                 markerColor: widget.markerColor,
+                loadingIndicator: widget.loadingIndicator,
               ),
             ));
       }),
