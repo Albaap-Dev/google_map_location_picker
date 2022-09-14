@@ -512,6 +512,7 @@ Future<LocationResult?> showLocationPicker(
   String language = 'en',
   LocationAccuracy desiredAccuracy = LocationAccuracy.best,
   Color markerColor = Colors.black,
+  Widget? progressIndicatorWidget,
 }) async {
   final results = await Navigator.of(context).push(
     MaterialPageRoute<dynamic>(
@@ -539,6 +540,7 @@ Future<LocationResult?> showLocationPicker(
           language: language,
           desiredAccuracy: desiredAccuracy,
           markerColor: markerColor,
+          progressIndicatorWidget: progressIndicatorWidget,
         );
       },
     ),
