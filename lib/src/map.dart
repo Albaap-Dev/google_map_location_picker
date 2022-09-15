@@ -294,9 +294,7 @@ class MapPickerState extends State<MapPicker> {
       );
 
       await Future.delayed(const Duration(milliseconds: 500));
-      Navigator.of(context)
-        ..pop()
-        ..pop();
+      Navigator.of(context).pop();
     }
   }
 
