@@ -443,6 +443,7 @@ class LocationPickerState extends State<LocationPicker> {
                 language: widget.language,
                 desiredAccuracy: widget.desiredAccuracy,
                 markerColor: widget.markerColor,
+                progressIndicatorWidget: widget.progressIndicatorWidget,
               ),
             ));
       }),
